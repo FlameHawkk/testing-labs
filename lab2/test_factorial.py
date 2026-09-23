@@ -1,0 +1,86 @@
+"""
+Модульные тесты для класса Factorial.
+Запуск:  python test_factorial.py
+Или:     python -m unittest test_factorial
+"""
+
+import unittest
+from factorial import Factorial
+
+class TestFactorial(unittest.TestCase):
+
+    # --- Базовые значения ---
+    def test_zero(self):
+        # 0! = 1 по определению
+        self.assertEqual(Factorial(0).compute(), 1)
+
+    def test_one(self):
+        self.assertEqual(Factorial(1).compute(), 1)
+
+    def test_two(self):
+        self.assertEqual(Factorial(2).compute(), 2)
+
+    # --- Типовые значения ---
+    def test_five(self):
+        # 5! = 120
+        self.assertEqual(Factorial(5).compute(), 120)
+
+    def test_ten(self):
+        # 10! = 3 628 800
+        self.assertEqual(Factorial(10).compute(), 3_628_800)
+
+    def test_twenty(self):
+        # 20! = 2 432 902 008 176 640 000
+        self.assertEqual(Factorial(20).compute(), 2_432_902_008_176_640_000)
+
+    # --- Рекурсивная реализация (совпадает с итеративной) ---
+    def test_recursive_matches_iterative(self):
+        for n in range(0, 15):
+            f = Factorial(n)
+            self.assertEqual(
+                f.compute(),
+                f.compute_recursive(),
+                msg=f"Расхождение на n={n}"
+            )
+
+    # --- Валидация ввода ---
+    def test_negative_raises(self):
+        with self.assertRaises(ValueError):
+            Factorial(-1)
+
+    def test_negative_large_raises(self):
+        with self.assertRaises(ValueError):
+            Factorial(-100)
+
+    def test_float_raises(self):
+        with self.assertRaises(TypeError):
+            Factorial(5.0)
+
+    def test_string_raises(self):
+        with self.assertRaises(TypeError):
+            Factorial("5")
+
+    # --- Математические свойства ---
+    def test_recurrence_relation(self):
+        # n! = n · (n-1)! для всех n ≥ 1
+        for n in range(1, 15):
+            self.assertEqual(
+                Factorial(n).compute(),
+                n * Factorial(n - 1).compute(),
+                msg=f"n! ≠ n·(n-1)! на n={n}"
+            )
+
+    def test_monotonic_growth(self):
+        # факториал строго возрастает, начиная с n=2
+        for n in range(2, 15):
+            self.assertLess(
+                Factorial(n - 1).compute(),
+                Factorial(n).compute()
+            )
+
+    # --- Строковое представление ---
+    def test_repr(self):
+        self.assertEqual(repr(Factorial(5)), "Factorial(5) = 120")
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
